@@ -12,56 +12,57 @@
  *
  */
 
- 	// get FIC core and settings
-//	require_once('FIC-class.php');
+	// get FIC core and settings
+    require_once('FIC-core.php');
     require_once('FIC-settings.php');
 
-	// add metadata to attachments
+    // add metadata to attachments
     require_once('FIC-meta.php');
 
-    // helper function to get all image attachments in WP that don't have a color set
-    function FIC_get_all_wp_attachments(){
 
-        $args = array(
-    		'posts_per_page'    => -1,
-            'meta_query'        => array(
-                array(
-                    'key'       => '_FIC_color',
-                    'compare'   => 'NOT EXISTS'
-                )
-            ),
-    		'post_type'         => 'attachment',
-    		'post_mime_type'    => 'image',
-    		'post_status'       => 'any',
-    		'fields'            => 'ids'
-    	);
+/*
+ * Set convenince functions for theme developer
+ */
 
-    	return get_posts($args);
+    // get primary image color
+    if ( !function_exists('get_primary_image_color') ){
+
+        function get_primary_image_color( $attachment_id ){
+            $output = '';
+
+            // if the image has a primary color, set as output
+            if ( $color = get_post_meta($attachment_id, 'FIC_color', true) ){
+                $output = $color;
+            }
+
+            return $output;
+        }
+
     }
 
-    // Helper function to detect one single image
-    function FIC_detect_single_image($attachment){
-        $attachment = get_post($attachment);
+    // get secondary image color from palette
+    if ( !function_exists('get_second_image_color') ){
 
-        // do stuff here
+        function get_second_image_color( $attachment_id ){
+            $output = '';
 
-        return;
+            // if attachment has a color palette...
+            if ( $color_palette = get_post_meta($attachment_id, 'FIC_palette', true) ){
+
+                // get the second color in the palette
+                if ( isset($color_palette[1]) )
+                    $output = rgb2hex($color_palette[1]);
+
+            }
+
+            return $output;
+        }
+
     }
 
-    // Primary function to loop all images and set colors
-    function FIC_detect_all_images(){
-
-        // get all attachments without a color
-        $attachment_ids = FIC_get_all_wp_attachments();
-
-        // loop and set a color for each
-        foreach ($attachment_ids as $attachment)
-            FIC_detect_single_image($attachment);
-
-        return;
-    }
-
-	// Set ten minute interval for cron
+/*
+ * Set up 10 minute cron schedule
+ */
 	function FIC_set_interval( $schedules ) {
 		$schedules['ten_minutes'] = array(
 			'interval' => 600,
@@ -76,15 +77,13 @@
 		wp_schedule_event( time(), 'ten_minutes', 'FIC_cron' );
 	}
 
-    // Hook import function to cron hook
+    // Hook main run function to cron hook
     add_action( 'FIC_cron', 'FIC_detect_all_images' );
 
 
-    // Link function to admin-ajax
-    add_action( 'wp_ajax_FIC_run', 'FIC_detect_all_images' );
-    add_action( 'wp_ajax_nopriv_FIC_run', 'FIC_detect_all_images' );
-
-
+/*
+ * Define ajax functions
+ */
     function FIC_get_all_attachments_ajax() {
 
         // get all attachments without a color
@@ -93,11 +92,58 @@
         header('Content-Type: application/json');
         echo json_encode($attachment_ids);
         exit;
+
     }
 
-    // Link instagram redirect to
+    // ajax function to get an array of all images that need to be detected
     add_action( 'wp_ajax_FIC_get_images', 'FIC_get_all_attachments_ajax' );
 
+    function FIC_detect_single_image_ajax() {
+
+        $output = 'error';
+        if ( isset($_REQUEST['target_image']) && $_REQUEST['target_image'] ){
+            $success = FIC_detect_single_image($_REQUEST['target_image']);
+
+            if ( $success )
+                $output = 'Detected color for image: ' . $_REQUEST['target_image'];
+        }
+
+        // output
+        header('Content-Type: text');
+        echo $output;
+        exit;
+    }
+
+    // ajax function to detect color for a single image
+    add_action( 'wp_ajax_FIC_detect_image', 'FIC_detect_single_image_ajax' );
+
+    // remove detected color for all images
+    function FIC_remove_detected_colors() {
+
+        // get all attachments, start counter
+        $all_attachment_ids = FIC_get_all_wp_attachments(false);
+        $count = 0;
+
+        // loop attachments...
+        foreach ( $all_attachment_ids as $attachment_id ){
+
+            // delete palette from image
+            delete_post_meta($attachment_id, 'FIC_palette');
+
+            // remove meta on this attachment
+            if ( delete_post_meta($attachment_id, 'FIC_color') )
+                $count++;
+
+        }
+
+        // output
+        header('Content-Type: text');
+        echo 'Color meta erased on ' . $count . ' attachments total.';
+        exit;
+    }
+
+    // ajax function to detect color for a single image
+    add_action( 'wp_ajax_FIC_remove_colors', 'FIC_remove_detected_colors' );
 
 	// Helper function to get this directory
 	if ( ! function_exists( 'pp' ) ) {
@@ -105,5 +151,16 @@
 	        return plugin_dir_url( __FILE__ );
 	    }
 	}
+
+/*
+ * Hook into "new attachment" event and detect colors for the incoming image
+ */
+    function FIC_detect_color_for_new_attachment( $post_id ) {
+
+        // run detection
+        FIC_detect_single_image($post_id);
+
+    }
+    add_action( 'add_attachment', 'FIC_detect_color_for_new_attachment', 10, 3 );
 
 ?>

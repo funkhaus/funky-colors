@@ -20,8 +20,36 @@
 
     ?>
 
-        <div class="wrap">
-            <h2>Funky Image Color Options</h2>
+        <div class="wrap regenthumbs">
+            <h2>Funky Image Colors</h2>
+
+            <form method="post" action="" id="FIC-settings" data-ajax-images="<?php echo get_admin_url(null, '/admin-ajax.php?action=FIC_get_images'); ?>" data-ajax-run="<?php echo get_admin_url(null, '/admin-ajax.php?action=FIC_detect_image'); ?>">
+                <?php //settings_fields('FIC_settings'); ?>
+
+                <p>Use this tool to detect the primary color of each image in the media library and save its hex value to the attachment as metadata.</p>
+
+                <p>Alternatively, you can also run the detect on a single image by finding the image in the media library and clicking the "detect color" link.</p>
+
+                <p>To begin the process on all images, click the button below.</p>
+
+                <p>
+                    <a href="<?php echo get_admin_url(null, '/admin-ajax.php?action=FIC_remove_colors'); ?>" id="FIC-remove-colors" class="button hide-if-no-js">Remove All Colors</a>
+                    <input type="submit" class="button button-primary hide-if-no-js" name="FIC-detect-colors" id="FIC-detect-colors" value="Detect Colors On All Images">
+                </p>
+
+                <noscript>&lt;p&gt;&lt;em&gt;You must enable Javascript in order to proceed!&lt;/em&gt;&lt;/p&gt;</noscript>
+
+        	</form>
+
+            <ul ID="FIC-console">
+                <?php if ( isset($_REQUEST['target_image']) && $_REQUEST['target_image'] ): ?>
+                    <?php if (FIC_detect_single_image($_REQUEST['target_image'])): ?>
+                        <li>Detected color for image: <?php echo $_REQUEST['target_image']; ?></li>
+                    <?php else: ?>
+                        <li>Error detecting color for image: <?php echo $_REQUEST['target_image']; ?></li>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </ul>
         </div><!-- END Wrap -->
 
         <?php
@@ -29,7 +57,7 @@
 
     /* Save Takeover Settings */
     function FIC_settings_init(){
-        // register_setting('funkstagram_settings', 'fgram_api_key');
+        // register_setting('FIC_settings', 'fgram_api_key');
     }
     add_action('admin_init', 'FIC_settings_init');
 
@@ -55,6 +83,6 @@
 
 	}
 
-	add_filter('contextual_help', 'funkstagram_plugin_help', 10, 3);
+	// add_filter('contextual_help', 'funkstagram_plugin_help', 10, 3);
 
 ?>

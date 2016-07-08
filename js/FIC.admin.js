@@ -1,36 +1,75 @@
 jQuery(document).ready(function(){
 
-	// Call tagsInput on tag fields
-	jQuery('#fgram_user_list').tagsInput({
-	   'height':'80px',
-	   'defaultText':'Usernames'
-	});
-	jQuery('#fgram_tag_list').tagsInput({
-	   'height':'80px',
-	   'defaultText':'Add Tags'
-	});
+    // Click on "Detect All Images" buton
+    jQuery(document).on('click', '#FIC-detect-colors', function(){
 
-	// Click on import button
-	jQuery(document).on('click', '#fgram_import', function(){
+        // grab CRON url
+        var imagesUrl = jQuery('#FIC-settings').data('ajaxImages');
+        var runUrl = jQuery('#FIC-settings').data('ajaxRun');
+        var runData = {target_image: ''};
 
-		// grab CRON url
-		var url = jQuery('#funkstagram_settings').data('cron');
+        // No url for ajax? do nothing
+        if ( ! imagesUrl ) return false;
 
-		// No url for ajax? do nothing
-		if ( ! url ) return false;
+        // Disable button
+        jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', 'disabled');
 
-		// Disable button		
-		jQuery(this).attr('disabled', 'disabled');
+        // AJAX request for list of images
+        jQuery.get(imagesUrl).success(function(data){
 
-		// AJAX request
-		jQuery.get(url).success(function(data){
+            // Append error log
+            jQuery('#FIC-console').html('<h4>Detecting ' + data.length + ' Images:</h4>');
 
-			// Append error log
-			jQuery('#funkstagram_settings').after('<div id="fgram_errors">' + data + '</div>');
+            var i = data.length;
+            data.forEach(function(attachmentID){
 
-			// Enable button
-			jQuery('#fgram_import').attr('disabled', false);
+                runData.target_image = attachmentID;
+                jQuery.get(runUrl, runData).done(function(message){
 
-		});
-	});
+                    i--;
+
+                    jQuery('#FIC-console h4').after('<li>' + message + '</li>');
+
+                    // was that the last request?
+                    if ( i == 0 ){
+
+                        // Enable button
+                        jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', false);
+
+                        // Done!
+                        jQuery('#FIC-console h4').after('<li>Done!</li>');
+                    }
+
+                });
+
+            });
+
+        });
+    });
+
+    // click "remove all colors" button
+    jQuery(document).on('click', '#FIC-remove-colors', function(e){
+
+        // break link
+        e.preventDefault();
+
+        // get ajax url
+        var url = jQuery(this).attr('href');
+
+        // Disable button
+        jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', 'disabled');
+
+        // send get request
+        jQuery.get(url).done(function(message){
+
+            // add resulting message to console
+            jQuery('#FIC-console').html('<h4>' + message + '</h4>');
+
+            // Enable button
+            jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', false);
+
+        });
+
+    });
+
 });
