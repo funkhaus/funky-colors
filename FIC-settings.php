@@ -4,8 +4,8 @@
      * admin Scripts and styles for plugin
      */
     function FIC_admin_style() {
-        wp_register_style( 'FIC_css', pp() . '/css/FIC.admin.css' );
-        wp_register_script( 'FIC_js', pp() . '/js/FIC.admin.js' );
+        wp_register_style( 'FIC_css', FICpp() . '/css/FIC.admin.css' );
+        wp_register_script( 'FIC_js', FICpp() . '/js/FIC.admin.js' );
 
         if ( is_admin() ) {
             wp_enqueue_style( 'FIC_css');
@@ -66,23 +66,5 @@
 	}
 
 	add_action('admin_menu','FIC_add_settings');
-
-
-	/* Add settings help menu dropdown */
-	function funkstagram_plugin_help($contextual_help, $screen_id, $screen) {
-
-		if ($screen_id == 'tools_page_funkstagram_settings') {
-
-			$contextual_help = wp_remote_get( trailingslashit( pp() ) . 'funkstagram-help.php' );
-
-		}
-
-		if ( wp_remote_retrieve_response_code( $contextual_help ) == 200 ) {
-			return wp_remote_retrieve_body( $contextual_help );
-		}
-
-	}
-
-	// add_filter('contextual_help', 'funkstagram_plugin_help', 10, 3);
 
 ?>

@@ -59,8 +59,9 @@
     function FIC_detect_single_image($attachment_id){
 
         // do stuff here
-        $imageURL = wp_get_attachment_image_src( $attachment_id, 'full');
-        $imageURL = $imageURL[0];
+        $imageURL = get_attached_file( $attachment_id );
+
+        if ( !$imageURL ) return false;
 
         $colorArray = ColorThief::getColor($imageURL, 5);
         $hex = rgb2hex($colorArray);

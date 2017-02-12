@@ -146,8 +146,8 @@
     add_action( 'wp_ajax_FIC_remove_colors', 'FIC_remove_detected_colors' );
 
 	// Helper function to get this directory
-	if ( ! function_exists( 'pp' ) ) {
-	    function pp() {
+	if ( ! function_exists( 'FICpp' ) ) {
+	    function FICpp() {
 	        return plugin_dir_url( __FILE__ );
 	    }
 	}
