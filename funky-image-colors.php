@@ -19,7 +19,6 @@
     // add metadata to attachments
     require_once('FIC-meta.php');
 
-
 /*
  * Set convenince functions for theme developer
  */
@@ -51,7 +50,7 @@
 
                 // get the second color in the palette
                 if ( isset($color_palette[1]) )
-                    $output = rgb2hex($color_palette[1]);
+                    $output = $color_palette[1];
 
             }
 
@@ -100,12 +99,14 @@
 
     function FIC_detect_single_image_ajax() {
 
-        $output = 'error';
+        $output = 'Unknown server error';
         if ( isset($_REQUEST['target_image']) && $_REQUEST['target_image'] ){
             $success = FIC_detect_single_image($_REQUEST['target_image']);
 
             if ( $success )
                 $output = 'Detected color for image: ' . $_REQUEST['target_image'];
+            else
+                $output = 'Error detecting colors for image: ' . $_REQUEST['target_image'];
         }
 
         // output
@@ -155,12 +156,18 @@
 /*
  * Hook into "new attachment" event and detect colors for the incoming image
  */
-    function FIC_detect_color_for_new_attachment( $post_id ) {
+    function FIC_detect_color_for_new_attachment( $image_data, $attachment_id ) {
+
+        // make server file path from data
+        $thumb_path = path_join( dirname($image_data['file']), $image_data['sizes']['thumbnail']['file'] );
+
+        // get wp upload directory
+        $upload_dir = wp_upload_dir();
 
         // run detection
-        FIC_detect_single_image($post_id);
-
+        FIC_detect_single_image($attachment_id, trailingslashit($upload_dir['basedir']) . $thumb_path);
+        return $image_data;
     }
-    add_action( 'add_attachment', 'FIC_detect_color_for_new_attachment', 10, 3 );
+    add_filter( 'wp_generate_attachment_metadata', 'FIC_detect_color_for_new_attachment', 20, 2);
 
 ?>

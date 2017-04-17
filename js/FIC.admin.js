@@ -1,3 +1,36 @@
+var runAllDetects = function(ids, progress, complete){
+
+    var i = 0;
+
+    var runSingleDetect = function(id){
+
+        jQuery.ajax({
+            url: jQuery('#FIC-settings').data('ajaxRun'),
+            data: {target_image: id}
+        })
+        .always(function(data){
+            var message = typeof data == 'string' ? data : 'error detecting image: ' + ids[i];
+
+            // update progress
+            if ( typeof progress == 'function' ) progress(message)
+
+            // inc
+            i++;
+
+            // reached the end!
+            if ( i < ids.length )
+                runSingleDetect(ids[i])
+            else if ( typeof complete == 'function' )
+                complete(i)
+
+        })
+
+    }
+
+    // kick loop
+    runSingleDetect(ids[i]);
+}
+
 jQuery(document).ready(function(){
 
     // Click on "Detect All Images" buton
@@ -5,8 +38,6 @@ jQuery(document).ready(function(){
 
         // grab CRON url
         var imagesUrl = jQuery('#FIC-settings').data('ajaxImages');
-        var runUrl = jQuery('#FIC-settings').data('ajaxRun');
-        var runData = {target_image: ''};
 
         // No url for ajax? do nothing
         if ( ! imagesUrl ) return false;
@@ -20,28 +51,20 @@ jQuery(document).ready(function(){
             // Append error log
             jQuery('#FIC-console').html('<h4>Detecting ' + data.length + ' Images:</h4>');
 
-            var i = data.length;
-            data.forEach(function(attachmentID){
+            // recursive function to handle all detects
+            runAllDetects(data, function(message){
+                // progress
 
-                runData.target_image = attachmentID;
-                jQuery.get(runUrl, runData).done(function(message){
+                jQuery('#FIC-console h4').after('<li>' + message + '</li>');
 
-                    i--;
+            }, function(total){
+                // complete!
 
-                    jQuery('#FIC-console h4').after('<li>' + message + '</li>');
+                // un-disable
+                jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', false);
 
-                    // was that the last request?
-                    if ( i == 0 ){
-
-                        // Enable button
-                        jQuery('#FIC-detect-colors, #FIC-remove-colors').attr('disabled', false);
-
-                        // Done!
-                        jQuery('#FIC-console h4').after('<li>Done!</li>');
-                    }
-
-                });
-
+                // Done!
+                jQuery('#FIC-console h4').after('<li>Done!</li>');
             });
 
         });
