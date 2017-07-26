@@ -8,7 +8,7 @@ A Wordpress plugin to detect a palette of colors from each image in the media li
 1. Use the [convenience functions](#convenience-functions) to work with image colors in your template.
 
 # Metadata
-Funky Colors stores its data under two main meta fields: `FIC_color` for the primary color, `FIC_secondary_color` for the manually-set secondary color, and `FIC_palette` for the image's [palette](https://github.com/thephpleague/color-extractor#usage).
+Funky Colors stores its data in a few meta fields: `FIC_color` for the primary color, `FIC_secondary_color` for the manually-set secondary color, and `FIC_palette` for the image's [palette](https://github.com/thephpleague/color-extractor#usage).
 
 It's best to use the `get_second_image_color` function to find an image's secondary color, since it will fall back to the appropriate value if `FIC_secondary_color` is not set.
 
