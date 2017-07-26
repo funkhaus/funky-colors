@@ -48,13 +48,11 @@
     // helper function to get all image attachments in WP that don't have a color set
     function FIC_get_all_wp_attachments($only_get_unset_images = true){
 
-        $meta_query = array();
+        $meta_query = false;
         if ( $only_get_unset_images ){
             $meta_query = array(
-                array(
-                    'key'       => 'FIC_color',
-                    'compare'   => 'NOT EXISTS'
-                )
+                'key'       => 'FIC_color',
+                'compare'   => 'NOT EXISTS'
             );
         }
 
@@ -63,12 +61,15 @@
     		'posts_per_page'    => -1,
     		'orderby'           => 'date',
     		'order'             => 'DESC',
-            'meta_query'        => $meta_query,
     		'post_type'         => 'attachment',
     		'post_mime_type'    => $accepted_mimes,
     		'post_status'       => 'any',
     		'fields'            => 'ids'
     	);
+
+        if( $meta_query !== false ){
+            $args['meta_query'] = $meta_query;
+        }
 
     	return get_posts($args);
     }
