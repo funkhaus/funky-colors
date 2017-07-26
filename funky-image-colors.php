@@ -6,7 +6,7 @@
  *	Plugin URI: http://funkhaus.us
  *	Description: A wordpress tool for finding the primary color of an image
  *	Author: John Robson, Funkhaus
- *	Version: 1.0
+ *	Version: 1.1
  *	Author URI: http://Funkhaus.us
  *	Requires at least: 3.8
  *
