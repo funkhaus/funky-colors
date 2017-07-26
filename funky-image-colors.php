@@ -45,8 +45,12 @@
         function get_second_image_color( $attachment_id ){
             $output = '';
 
+            if( ($secondary = get_post_meta($attachment_id, 'FIC_secondary_color', true) ) ){
+                $output = $secondary;
+            }
+
             // if attachment has a color palette...
-            if ( $color_palette = get_post_meta($attachment_id, 'FIC_palette', true) ){
+            else if ( $color_palette = get_post_meta($attachment_id, 'FIC_palette', true) ){
 
                 // get the second color in the palette
                 if ( isset($color_palette[1]) )
@@ -130,6 +134,9 @@
 
             // delete palette from image
             delete_post_meta($attachment_id, 'FIC_palette');
+
+            // delete secondary color from image
+            delete_post_meta($attachment_id, 'FIC_secondary_color');
 
             // remove meta on this attachment
             if ( delete_post_meta($attachment_id, 'FIC_color') )

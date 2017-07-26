@@ -8,13 +8,15 @@ A Wordpress plugin to detect a palette of colors from each image in the media li
 1. Use the [convenience functions](#convenience-functions) to work with image colors in your template.
 
 # Metadata
-Funky Colors stores its data under two main meta fields: `FIC_color` for the primary color, `FIC_palette` for the image's [palette](https://github.com/thephpleague/color-extractor#usage).
+Funky Colors stores its data under two main meta fields: `FIC_color` for the primary color, `FIC_secondary_color` for the manually-set secondary color, and `FIC_palette` for the image's [palette](https://github.com/thephpleague/color-extractor#usage).
+
+It's best to use the `get_second_image_color` function to find an image's secondary color, since it will fall back to the appropriate value if `FIC_secondary_color` is not set.
 
 You can use `$your_attachment->FIC_color` to find the main hex color of an image and `$your_attachment->FIC_palette[1]` to find the secondary hex color. The `FIC_palette` works like a zero-indexed array - substitute `1` with any number between `2` and `4` to try to find the third to fifth most common colors.
 
 # Convenience Functions
-* `get_primary_image_color( $attachment_id )` Returns the hex value of an image's primary color. Returns an empty string otherwise.
-* `get_second_image_color( $attachment_id )` Returns the hex value of an image's secondary color, if it has one. Returns an empty string otherwise.
+* `get_primary_image_color( $attachment_id )` Returns the hex value of an image's primary color, if it has one. Returns an empty string otherwise.
+* `get_second_image_color( $attachment_id )` Returns the hex value of an image's secondary color, if it has one. Uses the manually-set value first, then falls back to the secondary color from the palette. Returns an empty string if none found.
 
 --------
 

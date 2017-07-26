@@ -15,9 +15,11 @@ function FIC_att_meta($form_fields, $post) {
 	}
     $html .= "<input type='text' name='attachments[{$post->ID}][FIC_color]' id='attachments[{$post->ID}][FIC_color]' value='$current_value' />";
 
+	$html .= "<input type='text' name='attachments[{$post->ID}][FIC_secondary_color]' id='attachments[{$post->ID}][FIC_secondary_color]' value='$second'/>";
+
     $form_fields["FIC_color"] = array(
-        "label" => __("Primary Color"),
-        "helps" => __("Color automatically detected by Funky Image Colors"),
+        "label" => __("Main Colors"),
+        "helps" => __("Automatically detected by Funky Image Colors"),
         "input" => "html",
         "html"  => $html
     );
@@ -32,6 +34,12 @@ function FIC_save_att_meta($post, $attachment) {
         update_post_meta($post['ID'], 'FIC_color', $attachment['FIC_color']);
     } else {
         delete_post_meta($post['ID'], 'FIC_color');
+    }
+
+	if(isset($attachment['FIC_secondary_color'])) {
+        update_post_meta($post['ID'], 'FIC_secondary_color', $attachment['FIC_secondary_color']);
+    } else {
+        delete_post_meta($post['ID'], 'FIC_secondary_color');
     }
     return $post;
 }
