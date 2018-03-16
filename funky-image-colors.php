@@ -6,7 +6,7 @@
  *	Plugin URI: http://funkhaus.us
  *	Description: A wordpress tool for finding the primary color of an image
  *	Author: John Robson, Funkhaus
- *	Version: 1.1
+ *	Version: 1.2
  *	Author URI: http://Funkhaus.us
  *	Requires at least: 3.8
  *
@@ -73,15 +73,15 @@
 		);
 		return $schedules;
 	}
-	add_filter( 'cron_schedules', 'FIC_set_interval' );
+	// add_filter( 'cron_schedules', 'FIC_set_interval' );
 
     // set 10 minute cron
-	if ( ! wp_next_scheduled( 'FIC_cron' ) ) {
-		wp_schedule_event( time(), 'ten_minutes', 'FIC_cron' );
-	}
+// 	if ( ! wp_next_scheduled( 'FIC_cron' ) ) {
+// 		wp_schedule_event( time(), 'ten_minutes', 'FIC_cron' );
+// 	}
 
     // Hook main run function to cron hook
-    add_action( 'FIC_cron', 'FIC_detect_all_images' );
+    // add_action( 'FIC_cron', 'FIC_detect_all_images' );
 
 
 /*
