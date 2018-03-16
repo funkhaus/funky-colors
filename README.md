@@ -24,6 +24,6 @@ __funky-colors__
 
 http://funkhaus.us
 
-Version: 1.1
+Version: 1.2
 
 Requires at least WP 3.8
