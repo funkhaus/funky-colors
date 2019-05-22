@@ -113,8 +113,12 @@
             $primary = isset($colorArray[0]) ? $colorArray[0] : false;
 
             // save palette & primary as meta
-            update_post_meta($attachment_id, 'FIC_palette', $colorArray);
-            update_post_meta($attachment_id, 'FIC_color', $primary);
+			if ( class_exists('ACF') ) {
+				update_field("primary_color", $primary, $attachment_id);
+			} else {
+    	        update_post_meta($attachment_id, 'FIC_palette', $colorArray);
+	            update_post_meta($attachment_id, 'FIC_color', $primary);				
+			}
             $output = $colorArray;
 
         } catch (Exception $e) {

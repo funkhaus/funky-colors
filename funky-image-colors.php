@@ -137,6 +137,11 @@
 
             // delete secondary color from image
             delete_post_meta($attachment_id, 'FIC_secondary_color');
+			
+			// Delete ACF data		
+			if ( class_exists('ACF') ) {
+				delete_field("primary_color", $post['ID']);				
+			}
 
             // remove meta on this attachment
             if ( delete_post_meta($attachment_id, 'FIC_color') )

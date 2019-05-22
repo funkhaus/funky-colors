@@ -29,14 +29,22 @@ add_filter("attachment_fields_to_edit", "FIC_att_meta", null, 2);
 
 /* Save custom field value */
 function FIC_save_att_meta($post, $attachment) {
-
+	
     if(isset($attachment['FIC_color'])) {
-        update_post_meta($post['ID'], 'FIC_color', $attachment['FIC_color']);
+		if ( class_exists('ACF') ) {
+			update_field("primary_color", $attachment['FIC_color'], $post['ID']);
+		} else {
+	        update_post_meta($post['ID'], 'FIC_color', $attachment['FIC_color']);			
+		}
     } else {
-        delete_post_meta($post['ID'], 'FIC_color');
+		if ( class_exists('ACF') ) {
+			delete_field("primary_color", $post['ID']);
+		} else {
+	        delete_post_meta($post['ID'], 'FIC_color');
+		}
     }
 
-	if(isset($attachment['FIC_secondary_color'])) {
+	if(isset($attachment['FIC_secondary_color']) && !class_exists('ACF')) {
         update_post_meta($post['ID'], 'FIC_secondary_color', $attachment['FIC_secondary_color']);
     } else {
         delete_post_meta($post['ID'], 'FIC_secondary_color');
