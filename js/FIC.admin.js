@@ -34,7 +34,8 @@ var runAllDetects = function(ids, progress, complete){
 jQuery(document).ready(function(){
 
     // Click on "Detect All Images" buton
-    jQuery(document).on('click', '#FIC-detect-colors', function(){
+    jQuery(document).on('click', '#FIC-detect-colors', function(e){
+	    e.preventDefault();
 
         // grab CRON url
         var imagesUrl = jQuery('#FIC-settings').data('ajaxImages');
@@ -72,8 +73,6 @@ jQuery(document).ready(function(){
 
     // click "remove all colors" button
     jQuery(document).on('click', '#FIC-remove-colors', function(e){
-
-        // break link
         e.preventDefault();
 
         // get ajax url
